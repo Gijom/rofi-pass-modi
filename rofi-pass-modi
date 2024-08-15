@@ -17,7 +17,7 @@ function list_passwords {
 # list entries of password file $1
 function list_password_entries {
         echo "$FIRST_ENTRY_STR"
-		"$PASS_BIN" show "$1" | tail -n+2 | cut -s -d: -f1
+		( set -o pipefail; "$PASS_BIN" show "$1" | tail -n+2 | cut -s -d: -f1 ) || exit
 }
 
 # use rofi-dmenu to select an entry among those specified in $1
@@ -72,7 +72,7 @@ case "$ROFI_RETV" in
         ;;
     *)
         # last call -> rofi-dmenu mode
-        entries=$(list_password_entries "$@")
+        entries=$(list_password_entries "$@") || exit
         entry=$(select_entry "$entries")
         copy_entry "$@" "$entry"
        ;;
